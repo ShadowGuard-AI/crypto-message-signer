@@ -1,3 +1,5 @@
+![Banner](banner.png)
+
 # crypto-message-signer
 Signs messages using a private key and verifies signatures using a public key, supporting various signature algorithms (RSA, ECDSA, Ed25519). - Focused on Basic cryptographic operations
 
