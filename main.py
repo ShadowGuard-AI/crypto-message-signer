@@ -1,18 +1,23 @@
 import argparse
 import logging
-import os
 import sys
 
-from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import rsa, ec, ed25519
-from cryptography.hazmat.primitives.asymmetric.utils import Prehashed
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import ec, padding
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
-from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat, PrivateFormat, NoEncryption
 from cryptography.exceptions import InvalidSignature
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+_HASHES = {"sha256": hashes.SHA256, "sha384": hashes.SHA384, "sha512": hashes.SHA512}
+
+
+def _hash(name):
+    # argparse already restricts name to the keys above, so this cannot
+    # raise KeyError from the command line; library callers get one too.
+    return _HASHES[name]()
 
 def setup_argparse():
     """
@@ -60,44 +65,25 @@ def sign_message(message, private_key_path, algorithm, hash_algorithm):
 
     try:
         message_bytes = message.encode('utf-8')
+        h = _hash(hash_algorithm)
 
+        # The old code called private_key.signer() / public_key.verifier(),
+        # an incremental API that current cryptography releases removed, so
+        # RSA and ECDSA signing failed on every run. The one-shot sign()
+        # below is the supported replacement and is simpler here because
+        # the whole message is already in memory.
+        # RSA keeps PKCS1v15: the original passed a (non-working) padding
+        # object rather than PSS, so v1.5 preserves the intended scheme.
         if algorithm == "rsa":
-            if hash_algorithm == "sha256":
-                h = hashes.SHA256()
-            elif hash_algorithm == "sha384":
-                h = hashes.SHA384()
-            elif hash_algorithm == "sha512":
-                h = hashes.SHA512()
-            else:
-                raise ValueError("Unsupported hash algorithm")
-            signer = private_key.signer(
-                serialization.BestAvailablePadding(),
-                h
-            )
-            signer.update(message_bytes)
-            signature = signer.finalize()
-
+            return private_key.sign(message_bytes, padding.PKCS1v15(), h)
         elif algorithm == "ecdsa":
-            if hash_algorithm == "sha256":
-                h = hashes.SHA256()
-            elif hash_algorithm == "sha384":
-                h = hashes.SHA384()
-            elif hash_algorithm == "sha512":
-                h = hashes.SHA512()
-            else:
-                raise ValueError("Unsupported hash algorithm")
-
-            signer = private_key.signer(ec.ECDSA(h))
-            signer.update(message_bytes)
-            signature = signer.finalize()
-
-
+            return private_key.sign(message_bytes, ec.ECDSA(h))
         elif algorithm == "ed25519":
-            signature = private_key.sign(message_bytes)
+            # Ed25519 hashes internally; --hash_algorithm has no effect on
+            # it. Saying nothing about that would make the flag look broken.
+            return private_key.sign(message_bytes)
         else:
             raise ValueError("Unsupported algorithm")
-
-        return signature
 
     except Exception as e:
         logging.error(f"Error during signing: {e}")
@@ -120,42 +106,14 @@ def verify_message(message, public_key_path, signature_path, algorithm, hash_alg
 
     try:
         message_bytes = message.encode('utf-8')
+        h = _hash(hash_algorithm)
 
         if algorithm == "rsa":
-            if hash_algorithm == "sha256":
-                h = hashes.SHA256()
-            elif hash_algorithm == "sha384":
-                h = hashes.SHA384()
-            elif hash_algorithm == "sha512":
-                h = hashes.SHA512()
-            else:
-                raise ValueError("Unsupported hash algorithm")
-
-            verifier = public_key.verifier(
-                signature,
-                serialization.BestAvailablePadding(),
-                h
-            )
-            verifier.update(message_bytes)
-            verifier.verify()
-
+            public_key.verify(signature, message_bytes, padding.PKCS1v15(), h)
         elif algorithm == "ecdsa":
-            if hash_algorithm == "sha256":
-                h = hashes.SHA256()
-            elif hash_algorithm == "sha384":
-                h = hashes.SHA384()
-            elif hash_algorithm == "sha512":
-                h = hashes.SHA512()
-            else:
-                raise ValueError("Unsupported hash algorithm")
-
-            verifier = public_key.verifier(signature, ec.ECDSA(h))
-            verifier.update(message_bytes)
-            verifier.verify()
-
+            public_key.verify(signature, message_bytes, ec.ECDSA(h))
         elif algorithm == "ed25519":
             public_key.verify(signature, message_bytes)
-
         else:
             raise ValueError("Unsupported algorithm")
 
@@ -192,7 +150,10 @@ def main():
             logging.error("Public key path and signature path are required for verification.")
             sys.exit(1)
 
-        verify_message(args.message, args.public_key, args.signature, args.algorithm, args.hash_algorithm)
+        # An invalid signature is a result a caller needs in the exit
+        # code, not only in the log: exit 1 so scripts can branch on it.
+        if not verify_message(args.message, args.public_key, args.signature, args.algorithm, args.hash_algorithm):
+            sys.exit(1)
 
 
 if __name__ == "__main__":
