@@ -47,6 +47,9 @@ def load_key(key_path, is_private=True):
 
     try:
         if is_private:
+            # password=None is a real limit, not a default I can relax
+            # here: an encrypted PEM raises ValueError below and exits,
+            # and no flag in this tool accepts a passphrase.
             private_key = load_pem_private_key(key_data, password=None)
             return private_key
         else:
@@ -64,6 +67,9 @@ def sign_message(message, private_key_path, algorithm, hash_algorithm):
     private_key = load_key(private_key_path, is_private=True)
 
     try:
+        # Nothing checks the loaded key against the --algorithm choice.
+        # I rely on the library to refuse a mismatched pair, and the
+        # wide except below turns that refusal into a plain exit 1.
         message_bytes = message.encode('utf-8')
         h = _hash(hash_algorithm)
 
@@ -124,6 +130,10 @@ def verify_message(message, public_key_path, signature_path, algorithm, hash_alg
         logging.error("Signature is invalid.")
         return False
     except Exception as e:
+        # A wrong key type or a malformed signature lands here, not in
+        # InvalidSignature, but main treats both the same way: False,
+        # then exit 1. From the exit code alone, a broken setup and a
+        # genuinely bad signature cannot be told apart.
         logging.error(f"Error during verification: {e}")
         return False
 
@@ -142,6 +152,10 @@ def main():
         signature = sign_message(args.message, args.private_key, args.algorithm, args.hash_algorithm)
 
         # Output the signature to stdout (or save to a file if needed)
+        # Careful: this prints hex text, while verify reads the
+        # signature file as raw bytes. Saving this printout straight to
+        # a file and verifying against it fails, because the hex has to
+        # be decoded back to bytes first. The two ends do not match yet.
         print(signature.hex()) #Hex representation of the signature, suitable for storage/transfer
 
 
