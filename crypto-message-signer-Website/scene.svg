@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 300" role="img" aria-label="The flood in three bands: water and foam drifting in the far band, the raft drifting, dipping and turning in the middle band while workers carry brood across its deck, and ants linking at a torn grass clump in the near band">
+<rect width="900" height="300" fill="#574636"/>
+<g fill="#f7f0da"><circle cx="60" cy="40" r="3"/><circle cx="240" cy="66" r="2.4"/><circle cx="430" cy="34" r="3"/><circle cx="640" cy="58" r="2.4"/><circle cx="820" cy="38" r="3"/>
+<animateTransform attributeName="transform" type="translate" values="0 0; 46 0; 0 0" dur="14s" repeatCount="indefinite"/></g>
+<g stroke="#463828" stroke-width="5" stroke-linecap="round"><line x1="120" y1="70" x2="170" y2="60"/><line x1="700" y1="80" x2="752" y2="90"/>
+<animateTransform attributeName="transform" type="rotate" values="0 450 70; 4 450 70; 0 450 70" dur="18s" repeatCount="indefinite"/></g>
+<path d="M0 0 H900 V34 C700 48 420 30 220 44 C120 50 40 44 0 38 Z" fill="#3e5c2c"/>
+<g stroke="#6d8a4e" stroke-width="3"><line x1="620" y1="40" x2="626" y2="86"/><line x1="660" y1="42" x2="664" y2="92"/><line x1="706" y1="40" x2="714" y2="84"/></g>
+<g>
+<animateTransform attributeName="transform" type="translate" values="0 0; 120 6; 240 0" dur="26s" repeatCount="indefinite"/>
+<g>
+<animateTransform attributeName="transform" type="rotate" values="0 330 160; 3 330 160; 0 330 160; -2 330 160; 0 330 160" dur="13s" repeatCount="indefinite"/>
+<ellipse cx="330" cy="160" rx="150" ry="58" fill="#a01c2a"/>
+<g fill="#c4202c"><circle cx="220" cy="140" r="9"/><circle cx="262" cy="122" r="9"/><circle cx="312" cy="114" r="9"/><circle cx="366" cy="118" r="9"/><circle cx="414" cy="134" r="9"/><circle cx="440" cy="162" r="9"/><circle cx="416" cy="192" r="9"/><circle cx="362" cy="206" r="9"/><circle cx="306" cy="208" r="9"/><circle cx="252" cy="196" r="9"/><circle cx="272" cy="160" r="8"/><circle cx="330" cy="150" r="8"/><circle cx="388" cy="162" r="8"/><circle cx="330" cy="182" r="8"/></g>
+<circle cx="330" cy="164" r="14" fill="#96162a"/>
+<g fill="#f7f0da"><ellipse cx="362" cy="176" rx="7" ry="4.4"/><ellipse cx="376" cy="166" rx="7" ry="4.4"/><ellipse cx="360" cy="156" rx="7" ry="4.4"/></g>
+<g fill="#c4202c"><circle r="7"><animateMotion path="M250 168 L318 162" dur="7s" repeatCount="indefinite"/></circle><circle r="7"><animateMotion path="M410 150 L344 158" dur="9s" repeatCount="indefinite"/></circle></g>
+</g></g>
+<g stroke="#567a38" stroke-width="5"><line x1="30" y1="300" x2="44" y2="238"/><line x1="58" y1="300" x2="66" y2="244"/><line x1="86" y1="300" x2="98" y2="250"/></g>
+<polygon points="150,268 188,258 196,274 160,282" fill="#4a8a3e"/>
+<g fill="#c4202c"><circle r="7"><animateMotion path="M60 282 L150 272" dur="8s" repeatCount="indefinite"/></circle><circle r="7"><animateMotion path="M96 292 L176 278" dur="11s" repeatCount="indefinite"/></circle></g>
+</svg>
