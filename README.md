@@ -38,6 +38,10 @@ Signing prints the signature as hex on stdout. Verification takes the signature 
 - `--algorithm`: `rsa`, `ecdsa`, or `ed25519` (default: rsa). The key file must match the chosen algorithm.
 - `--hash_algorithm`: `sha256`, `sha384`, or `sha512` (default: sha256; RSA and ECDSA only).
 
+## Verified run note
+
+The usage and parameters above are taken from the argument parser in `main.py`. A live run in this environment is blocked because the `cryptography` package is not installed here, so even `--help` stops at that import; no run result is claimed for this tool.
+
 ## License
 
-Copyright (c) ShadowStrikeHQ
+Licensed under the terms in LICENSE.
